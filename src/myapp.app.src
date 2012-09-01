@@ -1,0 +1,12 @@
+{application, myapp,
+ [
+  {description, "App for persisting and analysing site traffic data"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { myapp_app, []}},
+  {env, []}
+ ]}.
