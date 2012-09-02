@@ -2,7 +2,7 @@
 -export ([getKey/1, set/2, client/0, init/0, party/0]).
 
 init() ->
-  io:format("I'm ALIIIIIIVE", []),
+  io:format("I'm ALIIIIIIVE~n"),
   party().
 
 party() ->
@@ -10,10 +10,10 @@ party() ->
   {From, get, Key} when is_list(Key) ->
     Val = binary_to_list(getKey(Key)),
     From ! {self(), Val},
-    party();
+    io:format("Dying quietly, alone. ~n");
   {From, set, Key, Value} when is_list(Key) andalso is_list(Value) ->
     From ! set(Key, Value),
-    party();
+    io:format("Dying quietly, alone. ~n");
   {stop} ->
     io:format("STOPPING"),
     true

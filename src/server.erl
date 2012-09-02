@@ -5,6 +5,5 @@
 -export([start/0]).
 
 start() ->
-  RedisWorker = spawn(redis_worker, init, []),
-  Watcher = spawn(watcher, loop, []),
-  [RedisWorker, Watcher].
+  RedisMaster = spawn(redis_master, loop, []),
+  [self(), RedisMaster].
