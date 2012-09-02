@@ -1,4 +1,4 @@
--module(myapp_app).
+-module(plato_app).
 
 -behaviour(application).
 
@@ -10,7 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    myapp_sup:start_link().
+    plato_sup:start_link().
 
 stop(_State) ->
     ok.

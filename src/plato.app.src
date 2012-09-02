@@ -1,4 +1,4 @@
-{application, myapp,
+{application, plato,
  [
   {description, "App for persisting and analysing site traffic data"},
   {vsn, "0.0.2"},
@@ -7,6 +7,6 @@
                   kernel,
                   stdlib
                  ]},
-  {mod, { myapp_app, []}},
+  {mod, { plato_app, []}},
   {env, []}
  ]}.

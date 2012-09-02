@@ -1,5 +1,5 @@
 
--module(myapp_sup).
+-module(plato_sup).
 
 -behaviour(supervisor).
 
