@@ -16,9 +16,10 @@ App for persisting and analysing site traffic data. Designed as a persistant bac
 3. run `rebar compile` inside the plato directory to compile
 
 #### Try it out
-(bash)    1.`$ erl -pa ebin -pa deps/*/ebin`
-(Eshell)  2. `1> [_, Watcher] = server:start().`
-          3. `Watcher ! {self(), send, [set, "walrus", "bubbles"]}.`
-          4. `Watcher ! {self(), send, [get, "walrus"]}.`
+
+1. From shell: `erl -pa ebin -pa deps/*/ebin`
+2. `1> [_, Watcher] = server:start().`
+3. `2> Watcher ! {self(), send, [set, "walrus", "bubbles"]}.`
+4. `3> Watcher ! {self(), send, [get, "walrus"]}.`
 
 There is currently a lot of noisy output. Sorry, I like to test with it and it will be gone when I'm more comfortable with Erlang. It's my party and I'll io:format if I want to.
