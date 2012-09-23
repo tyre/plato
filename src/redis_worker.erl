@@ -7,7 +7,7 @@ init() ->
 
 party() ->
   receive
-  {From, get, Key, Callback} when is_list(Key) andalso is_function(Callback) ->
+  {_From, get, Key, Callback} when is_list(Key) andalso is_function(Callback) ->
     Val = binary_to_list(getKey(Key)),
     Callback(Val),
     io:format("Dying quietly, alone. ~n");
