@@ -1,6 +1,6 @@
 {application, plato,
  [
-  {description, "App for persisting and analysing site traffic data"},
+  {description, "App for persisting data from Redis to Riak"},
   {vsn, "0.0.2"},
   {registered, []},
   {applications, [

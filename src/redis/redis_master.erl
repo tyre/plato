@@ -1,14 +1,21 @@
 -module(redis_master).
--export([loop/0]).
+-export([start/0]).
 
-loop() ->
+
+start() ->
+  C = client(),
+  loop(C).
+
+loop(Client) ->
   receive
-    {_From, send, Msg} ->
-      spawn(redis_worker, init, []) ! list_to_tuple([self() | Msg]),
-      loop();
+    {_From, send, Command} ->
+      spawn(redis_worker, init, []) ! {self(), Client, Command},
+      loop(Client);
+    {_From, send, Command, Callback} ->
+      spawn(redis_worker, init, []) ! {self(), Client, Command, Callback},
+      loop(Client);
     {_From, getkey, Params, Callback} ->
       ParamString = parameterize(Params),
-      io:format(ParamString),
       {ok, {{_Version, 200, _ReasonPhrase}, _Headers, Body}} = httpc:request(string:concat("http://localhost:7737/generate/event?", ParamString)),
       ParsedJson = jsx:decode(list_to_binary(Body)),
       Key = dict:fetch("key", ParsedJson),
@@ -16,10 +23,14 @@ loop() ->
       Callback(Key);
     {_From, Msg} ->
       io:format("Your Message: ~w~n", [Msg]),
-      loop();
+      loop(Client);
     stop ->
       io:format("Into the abyss...~n"),
       true
   end.
+
+client() ->
+  {ok, Client} = eredis:start_link(),
+  Client.
 
 parameterize(Keys) -> string:join(lists:map(fun ({Key, Val}) -> string:join([Key, Val], "=") end, dict:to_list(Keys)), "&").
