@@ -6,4 +6,5 @@
               {mod,{plato_app,[]}},
               {env,[]},
               {modules,[myapp_app,myapp_sup,plato_app,plato_sup,r,
-                        redis_master,redis_worker,server,watcher]}]}.
+                        redis_master,redis_worker,server,transfer_master,
+                        transfer_worker,watcher]}]}.

@@ -1,44 +1,35 @@
--module(redis_master).
--export([start/0, parameterize/1, client/0, getkey/1, getkey/2]).
+-module(transfer_master).
+-export([start/0, parameterize/1, getkey/1, getkey/2]).
 
 
 start() ->
-  C = client(),
-  put(watchers, []),
-  loop(C).
+  RedisC = redis_client(),
+  RiakC = riak_client(),
+  loop(RedisC, RiakC).
 
-loop(Client) ->
+loop(RedisClient, RiakClient) ->
   receive
-    {send, Command} ->
-      RW = spawn(redis_worker, send, [Client, Command]),
-      monitor(process, RW),
-      loop(Client);
-    {send, Command, Callback} ->
-      RW = spawn(redis_worker, send, [Client, Command, Callback]),
-      monitor(process, RW),
-      loop(Client);
-    {'DOWN', Ref, process, _Pid2, _Reason} ->
-      demonitor(Ref); %how should we handle this? Logging!
-    {watch_set, TransferMaster, Key} ->
-      NewWatcher = spawn(redis_worker, watch_set, [TransferMaster, Client, Key]),
-      put(watchers,[get(watchers), NewWatcher]),
-      loop(Client);
-    {clear_watchers} ->
-      clear_watchers(get(watchers));
+    {transfer, RedisKey} ->
+      spawn(transfer_worker, redis_to_riak, [RedisClient, RiakClient, RedisKey]),
+      loop(RedisClient, RiakClient);
+    {set_transfer, RedisSetKey} ->
+      spawn(redis_worker, get_set, [self(), RedisClient, RedisSetKey]),
+      loop(RedisClient, RiakClient);
+    ping ->
+      io:format("pong"),
+      loop(RedisClient, RiakClient);
     stop ->
       io:format("Into the abyss...~n"),
       true
   end.
 
-clear_watchers([H|T]) ->
-  exit(H, "Master clearing watchers"),
-  clear_watchers(T);
-clear_watchers([]) ->
-  put(watchers, []).
-
-client() ->
+redis_client() ->
   {ok, Client} = eredis:start_link(),
   Client.
+
+riak_client() ->
+  {ok, RiakC} = riakc_pb_socket:start_link("127.0.0.1", 8087),
+  RiakC.
 
 getkey(Params, Callback) when is_function(Callback) ->
   ParamString = parameterize(Params),

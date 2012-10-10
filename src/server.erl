@@ -3,5 +3,4 @@
 
 start() ->
   inets:start(),
-  RedisMaster = spawn(redis_master, start, []),
-  RedisMaster.
+  {spawn(transfer_master, start, []), spawn(redis_master, start, [])}.
