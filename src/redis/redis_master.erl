@@ -1,30 +1,35 @@
 -module(redis_master).
--export([start/0, parameterize/1, client/0, getkey/1, getkey/2]).
+-export([start/1, parameterize/1, client/0, getkey/1, getkey/2]).
 
 
-start() ->
+start(From) ->
   C = client(),
   put(watchers, []),
-  loop(C).
+  loop(From,C).
 
-loop(Client) ->
+loop(From, Client) ->
   receive
     {send, Command} ->
       RW = spawn(redis_worker, send, [Client, Command]),
       monitor(process, RW),
-      loop(Client);
+      loop(From, Client);
     {send, Command, Callback} ->
       RW = spawn(redis_worker, send, [Client, Command, Callback]),
       monitor(process, RW),
-      loop(Client);
-    {'DOWN', Ref, process, _Pid2, _Reason} ->
-      demonitor(Ref); %how should we handle this? Logging!
-    {watch_set, TransferMaster, Key} ->
-      NewWatcher = spawn(redis_worker, watch_set, [TransferMaster, Client, Key]),
+      loop(From, Client);
+    {get_data, Key} ->
+      RW = spawn(redis_worker, get_hash, [From, Client, Key]),
+      monitor(process, RW);
+    {transfer, Data} ->
+      From ! {redis_hash, Data};
+    {watch_set, Key} ->
+      NewWatcher = spawn(redis_worker, watch_set, [self(), Client, Key]),
       put(watchers,[get(watchers), NewWatcher]),
-      loop(Client);
+      loop(From, Client);
     {clear_watchers} ->
       clear_watchers(get(watchers));
+    {'DOWN', Ref, process, _Pid2, _Reason} ->
+      demonitor(Ref); %how should we handle this? Logging!
     stop ->
       io:format("Into the abyss...~n"),
       true

@@ -1,10 +1,9 @@
 -module (transfer_worker).
 
--export ([to_proplist/1, redis_to_riak/3]).
+-export ([to_proplist/1, redis_to_riak/2]).
 
 
-redis_to_riak(RedisClient, RiakClient, RedisKey) ->
-  TrackedData = to_proplist(eredis:q(RedisClient, ["HGET", RedisKey])),
+redis_to_riak(RiakClient, TrackedData) ->
   {RiakBucket, RiakKey} = riak_bucket_and_key(TrackedData),
   JSON = jsx:encode(TrackedData),
   riakc_pb_socket:put(RiakClient,

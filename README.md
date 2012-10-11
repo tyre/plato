@@ -18,8 +18,8 @@ App for persisting and analysing site traffic data. Designed as a persistant bac
 #### Try it out
 
 1. From shell: `erl -pa ebin -pa deps/*/ebin`
-2. `1> [_, Watcher] = server:start().`
-3. `2> Watcher ! {self(), send, [set, "walrus", "bubbles"]}.`
-4. `3> Watcher ! {self(), send, [get, "walrus"]}.`
+2. `1> [TransferMaster, RedisMaster] = server:start().`
+3. `2> RedisMaster ! {self(), send, [set, "walrus", "bubbles"]}.`
+4. `3> RedisMaster ! {self(), send, [get, "walrus"]}.`
 
-There is currently a lot of noisy output. Sorry, I like to test with it and it will be gone when I'm more comfortable with Erlang. It's my party and I'll io:format if I want to.
+RedisMaster (RM) contains all necessary Redis interop functionality. Similarly, TransferMaster (TM) handles logic related to moving data into Riak. There is some overlap, in that RM needs to know what to do with data once it is done with it. Ideally, however, TM can take in data without knowing anything about Redis.
