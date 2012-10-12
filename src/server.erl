@@ -3,4 +3,4 @@
 
 start() ->
   inets:start(),
-  {spawn(transfer_master, start, []), spawn(redis_master, start, [])}.
+  {spawn(riak_master, start, []), spawn(redis_master, start, [self()])}.
