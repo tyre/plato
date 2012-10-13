@@ -5,6 +5,7 @@ parameterize(Keys) -> string:join(lists:map(fun ({Key, Val}) -> string:join([to_
 
 response_body(Url) ->
   {ok, {{_Version, 200, _ReasonPhrase}, _Headers, Body}} = httpc:request(Url),
+  io:format("Body received from request to ~p:~n~p~n", [Url, Body]),
   Body.
 
 parse_json_hash(Json) ->
